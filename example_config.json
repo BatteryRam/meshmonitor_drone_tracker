@@ -1,0 +1,8 @@
+{
+    "warning_distance_km": 100,
+    "warning_message": "New objects have entered the monitored airspace. Number of objects: {}",
+    "border_data_file": "border.geojson",
+    "redis_host": "localhost",
+    "redis_port": 6379,
+    "cache_ttl": 86400
+}
