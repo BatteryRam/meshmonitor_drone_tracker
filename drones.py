@@ -1,9 +1,18 @@
+"""
+Simple MeshMonitor Drone Warning System
+Author: BatteryRam
+
+This script pulls live data from mapa.ua drone tracker and sends a warning to the Meshtastic Mesh when drones are detected within a specified distance away from the selected target.
+
+"""
+
 from geopandas import read_file, GeoSeries, GeoDataFrame
 from shapely import Point
 import requests
 import json
 import redis
 import sys
+import os
 
 def parse_multi_level_array(objects):
     ids = []
@@ -31,11 +40,28 @@ def main():
         config_path = sys.argv[1]
     else: 
         config_path = "/data/scripts/config.json"
-    config = json.load(open(config_path, "r"))
+    try:
+        config = json.load(open(config_path, "r"))
+    except Exception as e:
+        if config_path == "/data/scripts/config.json":
+            raise OSError(f"Cannot open config.json within scripts folder. Are you sure you have created the file? Error log: {e}")
+        else:
+            raise OSError(f"Cannot open {config_path} config file. Currently in folder {os.getcwd()}. Error log: {e}")
+    if config.get("warning_distance_km", None) is None:
+        raise Exception("warning_distance_km option is missing from configuration. Please set the minimum warning distance in the configuration file.")
+    if config.get("warning_message", None) is None:
+          raise Exception("warning_message option is missing from configuration. Please set your preferred warning message in the configuration file.")
+    if config.get("target_area_data_file", None) is None:
+          raise Exception("target_area_data_file option is missing from configuration. Please add the path to the target location file in the configuration file.")
     response = requests.get("https://mapa.ua/api/v1/current").json()
+
     if response["attack"] is None:
         return
-    area = read_file(config["border_data_file"])
+    try:
+        area = read_file(config.get("target_area_data_file", "/data/scripts/target.geojson"))
+    except Exception as e:
+        raise Exception(f"There was an error reading or parsing the target location file. Please ensure the file is GeoJSON-compliant. Error log: {e}")
+    
     r = redis.Redis(host=config.get("redis_host", "localhost"), port=config.get("redis_port", 6379), decode_responses=True)
 
     parsed_array = parse_multi_level_array(response["objects"])
