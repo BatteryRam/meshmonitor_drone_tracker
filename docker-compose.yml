@@ -1,0 +1,24 @@
+services:
+  meshmonitor:
+    build:
+      context: .
+      dockerfile: MeshMonitor_with_deps.Dockerfile
+    container_name: meshmonitor
+    ports: 
+      - "8008:3001"
+      - "8081:8081"
+    restart: unless-stopped
+    volumes:
+      - meshmonitor-data:/data
+    environment:
+      - NODE_ENV=
+      - MESHTASTIC_NODE_IP=
+      - MESHTASTIC_USE_TLS=
+      - ALLOWED_ORIGINS=
+      - TZ=  
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+volumes:
+  meshmonitor-data:
+    driver: local
