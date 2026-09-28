@@ -6,9 +6,10 @@ This script is designed to be run by [MeshMonitor](https://github.com/yeraze/mes
 ### Basic Installation
 
 1. Download docker-compose.yml and MeshMonitor_with_deps.Dockerfile into the same directory.
-2. Build the docker environment using docker compose
-3. Copy drones.py, config.json and target.geojson to your MeshMonitor's scripts directory
-4. Edit config.json and target.geojson according to your preferences. 
+2. Set MeshMonitor's configuration options inside docker-compose.yml
+3. Build the docker environment using docker compose
+4. Copy drones.py, config.json and target.geojson to your MeshMonitor's scripts directory
+5. Edit config.json and target.geojson according to your preferences. 
 
 Now you can call your script from within MeshMonitor. 
 
